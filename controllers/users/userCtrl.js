@@ -1,10 +1,27 @@
+const User = require('../../model/User/User')
 
 //Register
 const userRegisterCtrl = async (req, res) => {
+
+    const {firstname, lastname, profilePhoto, email, password} = req.body
+
     try {
+        // check if email exist
+        const userFound = await User.findOne({email})
+        if (userFound) {
+            return res.json({
+                msg: "User Alread Exist"
+            })
+        }
+        // hash password
+
+        // Create the user
+        const user = await User.create({
+            firstname, lastname, email, password
+        })
         res.json({
             status: "success",
-            data: "user registered"
+            data: user,
         })
     } catch (error) {
         res.json(error.message)
@@ -13,10 +30,30 @@ const userRegisterCtrl = async (req, res) => {
 
 // Login
 const userLoginCtrl = async (req, res) => {
+    
+    const {email, password} = req.body
+    // Check if email exist
+
     try {
+        // Check if email 
+        const userFound = await User.findOne({ email })
+
+        if (!userFound) {
+            return res.json({
+                msg: "Invalid login credentials",
+            })
+        }
+        // validity password
+        const isPasswordMatched = await User.findOne({ password })
+        if (!isPasswordMatched) {
+            return res.json({
+                msg: "Invalid login Credentials"
+            })
+        }
+
         res.json({
             status: "success",
-            data: "user login route success",
+            data: "user login",
         })
     } catch (error) {
         res.json(error.message)
