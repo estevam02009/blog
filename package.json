@@ -1,0 +1,25 @@
+{
+  "name": "blog-api",
+  "version": "1.0.0",
+  "description": "Blog API usando Nodejs e MongoDB",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "server": "nodemon server.js"
+  },
+  "keywords": [
+    "Node",
+    "Js",
+    "Express",
+    "js",
+    "mongoose"
+  ],
+  "author": " <SmartCode />",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "mongoose": "^6.8.3",
+    "nodemon": "^2.0.20"
+  }
+}
