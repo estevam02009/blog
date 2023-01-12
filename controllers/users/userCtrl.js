@@ -1,4 +1,7 @@
+const bcrypt = require('bcryptjs')
+
 const User = require('../../model/User/User')
+const generateToken = require('../../utils/generateToken')
 
 //Register
 const userRegisterCtrl = async (req, res) => {
@@ -13,11 +16,17 @@ const userRegisterCtrl = async (req, res) => {
                 msg: "User Alread Exist"
             })
         }
+
         // hash password
+        const salt = await bcrypt.genSalt(10)
+        const hashedPassword = await bcrypt.hash(password, salt)
 
         // Create the user
         const user = await User.create({
-            firstname, lastname, email, password
+            firstname, 
+            lastname, 
+            email, 
+            password: hashedPassword
         })
         res.json({
             status: "success",
@@ -37,23 +46,30 @@ const userLoginCtrl = async (req, res) => {
     try {
         // Check if email 
         const userFound = await User.findOne({ email })
-
         if (!userFound) {
             return res.json({
-                msg: "Invalid login credentials",
+                msg: "Invalid login credentials"
             })
         }
-        // validity password
-        const isPasswordMatched = await User.findOne({ password })
+
+        // Verify password
+        const isPasswordMatched = await bcrypt.compare(password, userFound.password)
+
         if (!isPasswordMatched) {
             return res.json({
-                msg: "Invalid login Credentials"
+                msg: "Invalid login credentials"
             })
         }
 
         res.json({
             status: "success",
-            data: "user login",
+            data: {
+                firstname: userFound.firstname,
+                lastname: userFound.lastname,
+                email: userFound.email,
+                isAdmin: userFound.isAdmin,
+                token: generateToken(userFound._id),
+            },
         })
     } catch (error) {
         res.json(error.message)
@@ -74,10 +90,14 @@ const usersCtrl = async (req, res) => {
 
 // Profile
 const userProfileCtrl = async (req, res) => {
+    
+    const {id} = req.params
     try {
+
+        const user = await User.findById(id)
         res.json({
             sttaus: "success",
-            data: "profile router success",
+            data: user,
         })
     } catch (error) {
         res.json(error.message)
